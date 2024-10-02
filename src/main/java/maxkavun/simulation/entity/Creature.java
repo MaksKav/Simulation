@@ -96,55 +96,69 @@ public abstract class Creature extends Entity implements Runnable {
     public static List<Coordinate> findPath(Coordinate start, Coordinate target, SimulationMap map) {
         Queue<Coordinate> queue = new LinkedList<Coordinate>();
         List<Coordinate> result = new ArrayList<>();
+        Set<Coordinate> visitedCoordinates = new HashSet<>();
 
         queue.add(start);
+        visitedCoordinates.add(start);
 
-        while (!queue.isEmpty() && (!queue.contains(null))) {
+        while (!queue.isEmpty()) {
             Coordinate currentCoordinate = queue.poll();
-            result.add(currentCoordinate);
 
-            if (currentCoordinate.equals(target)) {
-                queue.clear();
+            if (currentCoordinate != start) {
+                result.add(currentCoordinate);
             }
 
-            queue.add(getNeighboursWithBestDistance(currentCoordinate, target, map));
+            if (currentCoordinate.equals(target)) {
+                return result;
+            }
+
+            Optional<Coordinate> neighbour = getNeighbourWithBestDistanceToTarget(currentCoordinate, target, map, visitedCoordinates);
+            if (neighbour.isPresent() && !visitedCoordinates.contains(neighbour.get())) {
+                queue.add(neighbour.get());
+                visitedCoordinates.add(neighbour.get());
+            }
+
+            System.out.println("ERROR_ERROR_ERROR_ERROR_ERROR_ERROR_ERROR");
         }
-        return result;
+        return Collections.emptyList();
     }
+
 
     /*
      * This method selects the most advantageous option for the next step based on the distance to the target.
      * It evaluates the valid neighboring coordinates and returns the one with the minimum distance to the target.
      */
-    private static Coordinate getNeighboursWithBestDistance(Coordinate coordinate, Coordinate target, SimulationMap map) {
+    private static Optional<Coordinate> getNeighbourWithBestDistanceToTarget(Coordinate coordinate, Coordinate target, SimulationMap map, Set<Coordinate> visitedCoordinates) {
         List<Coordinate> neighbours = new ArrayList<>();
-        Coordinate coordinateWithMinDistance = null;
         int x = coordinate.getX();
         int y = coordinate.getY();
 
-        if (Coordinate.isValidCoordinate(new Coordinate(x + 1, y), map)) {
+        if (Coordinate.isValidCoordinate(new Coordinate(x + 1, y), map) && !visitedCoordinates.contains(new Coordinate(x + 1, y))) {
             neighbours.add(new Coordinate(x + 1, y));
         }
-        if (Coordinate.isValidCoordinate(new Coordinate(x, y + 1), map)) {
+        if (Coordinate.isValidCoordinate(new Coordinate(x, y + 1), map) && !visitedCoordinates.contains(new Coordinate(x, y + 1))) {
             neighbours.add(new Coordinate(x, y + 1));
         }
-        if (Coordinate.isValidCoordinate(new Coordinate(x, y - 1), map)) {
+        if (Coordinate.isValidCoordinate(new Coordinate(x, y - 1), map) && !visitedCoordinates.contains(new Coordinate(x, y - 1))) {
             neighbours.add(new Coordinate(x, y - 1));
         }
-        if (Coordinate.isValidCoordinate(new Coordinate(x - 1, y), map)) {
+        if (Coordinate.isValidCoordinate(new Coordinate(x - 1, y), map) && !visitedCoordinates.contains(new Coordinate(x - 1, y))) {
             neighbours.add(new Coordinate(x - 1, y));
         }
 
         double minDistance = Double.MAX_VALUE;
-        for (int i = 0; i < neighbours.size(); i++) {
-            double distance = calculateDistance(neighbours.get(i), target);
+        Coordinate coordinateWithMinDistance = null;
+
+        for (Coordinate neighbour : neighbours) {
+            double distance = calculateDistance(neighbour, target);
             if (distance < minDistance) {
                 minDistance = distance;
-                coordinateWithMinDistance = neighbours.get(i);
+                coordinateWithMinDistance = neighbour;
             }
         }
-        return coordinateWithMinDistance;
+        return Optional.ofNullable(coordinateWithMinDistance);
     }
+
 
     /*
      * This method checks the neighboring coordinates around the current currentPosition.
