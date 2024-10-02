@@ -5,7 +5,7 @@ import main.java.maxkavun.simulation.entity.herbivore.Herbivore;
 import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
 import main.java.maxkavun.simulation.map.Coordinate;
 
-public class Predator extends Creature {
+public abstract class Predator extends Creature {
 
     protected int damage;
 
@@ -32,5 +32,7 @@ public class Predator extends Creature {
     public void eat(HerbivoreResources herbivoreResources) {
         throw new UnsupportedOperationException("Predators cannot eat resources.");
     }
+
+
 
 }

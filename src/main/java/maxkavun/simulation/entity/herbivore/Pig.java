@@ -19,6 +19,11 @@ public class Pig extends Herbivore {
     }
 
     @Override
+    public void reloadSteps() {
+        setAvailableSteps(1);
+    }
+
+    @Override
     public String toString() {
         return icon;
     }

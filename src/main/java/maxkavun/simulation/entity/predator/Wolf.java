@@ -19,6 +19,11 @@ public class Wolf extends Predator {
     }
 
     @Override
+    public void reloadSteps() {
+        setAvailableSteps(2);
+    }
+
+    @Override
     public String toString() {
         return icon;
     }

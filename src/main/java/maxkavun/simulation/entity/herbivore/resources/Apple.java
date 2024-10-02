@@ -4,7 +4,7 @@ public class Apple extends HerbivoreResources {
 
     public Apple() {
         this.icon = "\uD83C\uDF4F";
-        this.health = 1 ;
+        this.health = 2 ;
     }
 
     @Override

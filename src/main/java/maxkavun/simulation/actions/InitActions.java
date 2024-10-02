@@ -31,37 +31,45 @@ public class InitActions {
         for (int i = 0; i < SimulationMap.getInstance().getHEIGHT(); i++) {
             for (int j = 0; j < SimulationMap.getInstance().getWIDTH(); j++) {
                 Coordinate coordinate = new Coordinate(i, j);
-                int randomInt = (int) (Math.random() * 101);
+                int randomInt = (int) (Math.random() * 201);
                 Cell cell;
 
                 switch (randomInt) {
                     case 0:
                     case 1:
+                    case 2:
+                    case 3:
                         cell = new Cell(coordinate, new Rock());
                         break;
-                    case 2:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        cell = new Cell(coordinate, new Tree());
+                        break;
+                    case 9:
                         cell = new Cell(coordinate, new Pig(coordinate));
                         creatures.add((Creature) cell.getEntity());
                         counterPig++;
                         break;
-                    case 3:
+                    case 10:
                         cell = new Cell(coordinate, new Rabbit(coordinate));
                         creatures.add((Creature) cell.getEntity());
                         counterRabbit++;
                         break;
-                    case 4:
+                    case 11:
                         cell = new Cell(coordinate, new Wolf(coordinate));
                         creatures.add((Creature) cell.getEntity());
                         counterWolf++;
                         break;
-                    case 5:
-                    case 6:
-                        cell = new Cell(coordinate, new Tree());
-                        break;
-                    case 7:
+                    case 12:
+                    case 13:
+                    case 14:
                         cell = new Cell(coordinate, new Grass());
                         break;
-                    case 8:
+                    case 15:
+                    case 16:
+                    case 17:
                         cell = new Cell(coordinate, new Apple());
                         break;
                     default:

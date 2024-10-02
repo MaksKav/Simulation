@@ -4,7 +4,7 @@ public class Grass extends HerbivoreResources {
 
     public Grass() {
         this.icon = "🌿";
-        this.health = 2 ;
+        this.health = 1 ;
     }
 
     @Override

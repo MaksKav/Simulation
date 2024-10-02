@@ -2,6 +2,7 @@ package main.java.maxkavun.simulation.map;
 
 import main.java.maxkavun.simulation.entity.Barrier;
 import main.java.maxkavun.simulation.entity.Creature;
+import main.java.maxkavun.simulation.entity.EmptyPlace;
 import main.java.maxkavun.simulation.entity.Entity;
 
 import java.util.Objects;
@@ -25,13 +26,7 @@ public class Coordinate {
         int y = coordinate.getY();
         Entity cellEntity = map.getMap().get(coordinate).getEntity();
 
-        if (x < 0 || x >= map.getHEIGHT()
-                || y < 0 || y >= map.getWIDTH()
-                || cellEntity == null || cellEntity instanceof Creature || cellEntity instanceof Barrier) {
-            return false;
-        } else {
-            return true;
-        }
+        return cellEntity instanceof EmptyPlace;
     }
 
     public static Coordinate getRandomCoordinate() {

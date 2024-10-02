@@ -4,7 +4,7 @@ import main.java.maxkavun.simulation.entity.Creature;
 import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
 import main.java.maxkavun.simulation.map.Coordinate;
 
-public class Herbivore extends Creature {
+public abstract class Herbivore extends Creature {
 
     protected boolean isAlive = true;
 
@@ -19,6 +19,7 @@ public class Herbivore extends Creature {
         if (this.getAvailableSteps() > 0){
             this.setAvailableSteps(this.getAvailableSteps() - 1);
             this.setHealth(this.getHealth() + 20);
+            herbivoreResources.setHealth(herbivoreResources.getHealth() - 1);
         }
     }
 

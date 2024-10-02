@@ -33,6 +33,7 @@ public abstract class Creature extends Entity implements Runnable {
 
     public abstract void eat(HerbivoreResources herbivoreResources);
 
+    public abstract void reloadSteps();
 
     @Override
     public void run() {
@@ -52,37 +53,42 @@ public abstract class Creature extends Entity implements Runnable {
 
     public void makeMove() {
         synchronized (SimulationMap.getInstance()) {
+            this.reloadSteps();
+
             for (int i = 0; i < this.availableSteps; i++) {
                 Coordinate targetCoordinate = this.findClosestResources(SimulationMap.getInstance());
 
-                if (targetCoordinate != null) {
-                    pathToResources = findPath(this.currentPosition, targetCoordinate, SimulationMap.getInstance());
-                    Coordinate nextStep = pathToResources.get(0);
+                    this.pathToResources = findPath(this.currentPosition, targetCoordinate, SimulationMap.getInstance());
+                    Coordinate nextStep = this.pathToResources.get(0);
 
                     if (nextStep.equals(targetCoordinate)) {
                         Entity targetEntity = SimulationMap.getInstance().getMap().get(targetCoordinate).getEntity();
 
-                        if (targetEntity instanceof Herbivore) {
+                        //The logic of interaction between the predator and its resource (herbivore) .
+                        if (this instanceof Predator) {
                             if (((Herbivore) targetEntity).isAlive()) {
                                 this.eat((Herbivore) targetEntity);
                                 if (!((Herbivore) targetEntity).isAlive() && this.availableSteps > 0) {
                                     goNextCell(nextStep);
+                                } else if (!((Herbivore) targetEntity).isAlive() && this.availableSteps <= 0) {
+                                    SimulationMap.getInstance().getMap().put(nextStep, new Cell(nextStep, new EmptyPlace()));
                                 }
                             }
-                        } else if (targetEntity instanceof HerbivoreResources) {
+                            //The logic of interaction between the herbivore and its resource.
+                        } else if (this instanceof Herbivore) {
                             if (((HerbivoreResources) targetEntity).getHealth() > 0) {
                                 this.eat((HerbivoreResources) targetEntity);
                                 if (((HerbivoreResources) targetEntity).getHealth() <= 0 && this.availableSteps > 0) {
                                     goNextCell(nextStep);
+                                } else if (((HerbivoreResources) targetEntity).getHealth() <= 0 && this.availableSteps <= 0) {
+                                    SimulationMap.getInstance().getMap().put(nextStep, new Cell(nextStep, new EmptyPlace()));
                                 }
                             }
                         }
                     } else {
                         goNextCell(nextStep);
                     }
-                } else {
-                    throw new NullPointerException("Target coordinate is null");
-                }
+
 
             }
         }
@@ -94,15 +100,17 @@ public abstract class Creature extends Entity implements Runnable {
      * It adds each step to the result until the target is reached.
      */
     public static List<Coordinate> findPath(Coordinate start, Coordinate target, SimulationMap map) {
+
         Queue<Coordinate> queue = new LinkedList<Coordinate>();
         List<Coordinate> result = new ArrayList<>();
         Set<Coordinate> visitedCoordinates = new HashSet<>();
 
         queue.add(start);
-        visitedCoordinates.add(start);
+
 
         while (!queue.isEmpty()) {
             Coordinate currentCoordinate = queue.poll();
+            visitedCoordinates.add(start);
 
             if (currentCoordinate != start) {
                 result.add(currentCoordinate);
@@ -112,13 +120,15 @@ public abstract class Creature extends Entity implements Runnable {
                 return result;
             }
 
+
+            //      visitedCoordinates.addAll(checkedCoordinates(currentCoordinate, map));
+
             Optional<Coordinate> neighbour = getNeighbourWithBestDistanceToTarget(currentCoordinate, target, map, visitedCoordinates);
             if (neighbour.isPresent() && !visitedCoordinates.contains(neighbour.get())) {
                 queue.add(neighbour.get());
                 visitedCoordinates.add(neighbour.get());
             }
 
-            System.out.println("ERROR_ERROR_ERROR_ERROR_ERROR_ERROR_ERROR");
         }
         return Collections.emptyList();
     }
@@ -212,7 +222,7 @@ public abstract class Creature extends Entity implements Runnable {
 
         }
         if (this instanceof Herbivore && closestCoordinate == null) {
-            TurnActions.addHerbivoreResources(1, SimulationMap.getInstance().getMap());
+            TurnActions.addHerbivoreResources(1, SimulationMap.getInstance());
         }
         if (this instanceof Predator && closestCoordinate == null) {
             System.out.println("Game over - all herbivores have been eaten");
@@ -235,6 +245,7 @@ public abstract class Creature extends Entity implements Runnable {
         SimulationMap.getInstance().getMap().put(beforePosition, new Cell(beforePosition, new EmptyPlace()));
         this.setAvailableSteps(this.getAvailableSteps() - 1);
     }
+
 
     public boolean getIsAlive() {
         return isAlive;

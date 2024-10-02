@@ -19,6 +19,11 @@ public class Rabbit extends Herbivore {
     }
 
     @Override
+    public void reloadSteps() {
+        setAvailableSteps(3);
+    }
+
+    @Override
     public String toString() {
         return icon;
     }
