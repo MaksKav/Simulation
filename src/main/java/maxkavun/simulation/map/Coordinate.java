@@ -1,5 +1,9 @@
 package main.java.maxkavun.simulation.map;
 
+import main.java.maxkavun.simulation.entity.Barrier;
+import main.java.maxkavun.simulation.entity.Creature;
+import main.java.maxkavun.simulation.entity.Entity;
+
 import java.util.Objects;
 
 public class Coordinate {
@@ -10,6 +14,30 @@ public class Coordinate {
     public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    /*
+     * This method checks whether the given currentPosition is valid within the map boundaries
+     * and whether it does not contain an entity that blocks movement.
+     */
+    public static boolean isValidCoordinate(Coordinate coordinate, SimulationMap map) {
+        int x = coordinate.getX();
+        int y = coordinate.getY();
+        Entity cellEntity = map.getMap().get(coordinate).getEntity();
+
+        if (x < 0 || x >= map.getHEIGHT()
+                || y < 0 || y >= map.getWIDTH()
+                || cellEntity == null || cellEntity instanceof Creature || cellEntity instanceof Barrier) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public static Coordinate getRandomCoordinate() {
+        int randomHeight = (int) (Math.random() * (SimulationMap.getInstance().getHEIGHT()));
+        int randomWidth = (int) (Math.random() * (SimulationMap.getInstance().getWIDTH()));
+        return new Coordinate(randomWidth, randomHeight);
     }
 
     @Override
