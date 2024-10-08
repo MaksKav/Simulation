@@ -27,4 +27,5 @@ The game operates in rounds. You must specify the number of moves (turns) you wa
 The simulation will automatically pause if all predators or all herbivores die. At this point, you will have the option to:
 * Start a new simulation with a completely new map.
 * Exit the simulation.
+* 
 ![simulation_final.png](images/simulation_final.png)
