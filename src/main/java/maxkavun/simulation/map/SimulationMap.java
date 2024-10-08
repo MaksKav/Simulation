@@ -2,8 +2,9 @@ package main.java.maxkavun.simulation.map;
 
 import main.java.maxkavun.simulation.actions.InitActions;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 
 public class SimulationMap {
@@ -15,7 +16,7 @@ public class SimulationMap {
 
 
     private SimulationMap() {
-        map = new ConcurrentHashMap<Coordinate, Cell>();
+        map = new HashMap<Coordinate , Cell>();
     }
 
 
@@ -25,6 +26,10 @@ public class SimulationMap {
             InitActions.initialMap();
         }
         return instance;
+    }
+
+    public static void resetInstance() {
+        instance = null;
     }
 
 

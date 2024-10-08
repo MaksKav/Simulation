@@ -12,7 +12,4 @@ public class EmptyPlace extends Entity {
         return icon;
     }
 
-    public String getIcon() {
-        return icon;
-    }
 }

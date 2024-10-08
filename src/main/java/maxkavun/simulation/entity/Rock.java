@@ -11,7 +11,4 @@ public class Rock extends Barrier{
         return icon;
     }
 
-    public String getIcon() {
-        return icon;
-    }
 }

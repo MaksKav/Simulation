@@ -8,13 +8,13 @@ public class Rabbit extends Herbivore {
     public Rabbit(Coordinate coordinate) {
         super(coordinate);
         this.icon = "\uD83D\uDC30" ;
-        this.health = 80 ;
+        this.health = 130 ;
         this.availableSteps = 3 ;
     }
 
     public Rabbit() {
         this.icon = "\uD83D\uDC30" ;
-        this.health = 80 ;
+        this.health = 130 ;
         this.availableSteps = 3 ;
     }
 

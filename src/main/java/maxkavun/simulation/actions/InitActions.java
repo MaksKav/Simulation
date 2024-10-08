@@ -1,5 +1,6 @@
 package main.java.maxkavun.simulation.actions;
 
+import main.java.maxkavun.simulation.display.SimulationDisplay;
 import main.java.maxkavun.simulation.entity.Creature;
 import main.java.maxkavun.simulation.entity.EmptyPlace;
 import main.java.maxkavun.simulation.entity.Rock;
@@ -12,21 +13,46 @@ import main.java.maxkavun.simulation.entity.predator.Wolf;
 import main.java.maxkavun.simulation.map.Cell;
 import main.java.maxkavun.simulation.map.Coordinate;
 import main.java.maxkavun.simulation.map.SimulationMap;
+import main.java.maxkavun.simulation.renderer.Renderer;
+
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import static main.java.maxkavun.simulation.map.Coordinate.getRandomCoordinate;
-import static main.java.maxkavun.simulation.map.Coordinate.isValidCoordinate;
+import static java.lang.Thread.sleep;
+
 
 public class InitActions {
-    public static final List<Creature> creatures = new CopyOnWriteArrayList<Creature>();
+    public static final List<Creature> creatures = new ArrayList<Creature>();
+
+
+    public static void startSimulation(int moves)  {
+
+        for (int move = 0; move < moves ; move++) {
+
+            InitActions.creatures.removeIf(creature -> !creature.getIsAlive());
+
+            for (Creature creature : InitActions.creatures) {
+                if (creature.getIsAlive()) {
+                    creature.makeMove();
+                }
+            }
+
+            Renderer.drawMap(SimulationMap.getInstance());
+            TurnActions.checkForVictoryCondition(creatures);
+            try {
+                sleep(1200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        SimulationDisplay.showMiddleDisplay();
+    }
 
     public static void initialMap() {
-        int counterPig = 0;
         int counterRabbit = 0;
         int counterWolf = 0;
+        int counterPig = 0;
 
         for (int i = 0; i < SimulationMap.getInstance().getHEIGHT(); i++) {
             for (int j = 0; j < SimulationMap.getInstance().getWIDTH(); j++) {
@@ -79,29 +105,15 @@ public class InitActions {
             }
         }
         if (counterPig == 0) {
-            addCreatureIfAbsent(new Pig());
+            TurnActions.addCreature(new Pig());
         }
 
         if (counterRabbit == 0) {
-            addCreatureIfAbsent(new Rabbit());
+            TurnActions.addCreature(new Rabbit());
         }
 
         if (counterWolf == 0) {
-            addCreatureIfAbsent(new Wolf());
-        }
-    }
-
-
-    private static void addCreatureIfAbsent(Creature creature) {
-        Coordinate coordinate = getRandomCoordinate();
-
-        if (isValidCoordinate(coordinate, SimulationMap.getInstance())) {
-            creature.setCurrentPosition(coordinate);
-            Cell cell = new Cell(coordinate, creature);
-            SimulationMap.getInstance().getMap().put(coordinate, cell);
-            creatures.add((Creature) cell.getEntity());
-        } else {
-            addCreatureIfAbsent(creature);
+           TurnActions.addCreature(new Wolf());
         }
     }
 }

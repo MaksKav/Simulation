@@ -12,7 +12,4 @@ public class Tree extends Barrier {
         return icon;
     }
 
-    public String getIcon() {
-        return icon;
-    }
 }

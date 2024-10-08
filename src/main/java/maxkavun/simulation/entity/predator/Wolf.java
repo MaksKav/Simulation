@@ -9,12 +9,14 @@ public class Wolf extends Predator {
         super(coordinate);
         this.icon = "\uD83D\uDC3A";
         this.damage = 100;
+        this.health = 200;
         this.availableSteps = 2;
     }
 
     public Wolf() {
         this.icon = "\uD83D\uDC3A";
         this.damage = 100;
+        this.health = 200;
         this.availableSteps = 2;
     }
 

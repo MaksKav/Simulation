@@ -1,9 +1,12 @@
 package main.java.maxkavun.simulation.map;
 
-import main.java.maxkavun.simulation.entity.Barrier;
+
 import main.java.maxkavun.simulation.entity.Creature;
 import main.java.maxkavun.simulation.entity.EmptyPlace;
 import main.java.maxkavun.simulation.entity.Entity;
+import main.java.maxkavun.simulation.entity.herbivore.Herbivore;
+import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
+import main.java.maxkavun.simulation.entity.predator.Predator;
 
 import java.util.Objects;
 
@@ -12,22 +15,41 @@ public class Coordinate {
     private int x;
     private int y;
 
+
     public Coordinate(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
+
     /*
-     * This method checks whether the given currentPosition is valid within the map boundaries
-     * and whether it does not contain an entity that blocks movement.
+      This method checks if the place is empty.
      */
     public static boolean isValidCoordinate(Coordinate coordinate, SimulationMap map) {
-        int x = coordinate.getX();
-        int y = coordinate.getY();
-        Entity cellEntity = map.getMap().get(coordinate).getEntity();
-
-        return cellEntity instanceof EmptyPlace;
+        if (map.getMap().containsKey(coordinate)) {
+            Entity cellEntity = map.getMap().get(coordinate).getEntity();
+            return cellEntity instanceof EmptyPlace;
+        } else {
+            return false;
+        }
     }
+
+    /*
+     This method checks if the given coordinate is valid for the creature's next move.
+     */
+    public static boolean isValidCoordinate(Creature creature, Coordinate coordinate, SimulationMap map) {
+        Cell cell = map.getMap().get(coordinate);
+        if (cell != null) {
+            Entity cellEntity = cell.getEntity();
+            if (creature instanceof Herbivore) {
+                return cellEntity instanceof HerbivoreResources || cellEntity instanceof EmptyPlace;
+            } else if (creature instanceof Predator) {
+                return cellEntity instanceof Herbivore || cellEntity instanceof EmptyPlace;
+            }
+        }
+        return false;
+    }
+
 
     public static Coordinate getRandomCoordinate() {
         int randomHeight = (int) (Math.random() * (SimulationMap.getInstance().getHEIGHT()));
@@ -55,4 +77,13 @@ public class Coordinate {
     public int getY() {
         return y;
     }
+
+    @Override
+    public String toString() {
+        return "Coordinate{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }
+
