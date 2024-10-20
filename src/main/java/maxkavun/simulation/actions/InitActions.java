@@ -1,19 +1,13 @@
 package main.java.maxkavun.simulation.actions;
 
 import main.java.maxkavun.simulation.display.SimulationDisplay;
-import main.java.maxkavun.simulation.entity.Creature;
-import main.java.maxkavun.simulation.entity.EmptyPlace;
-import main.java.maxkavun.simulation.entity.Rock;
-import main.java.maxkavun.simulation.entity.Tree;
+import main.java.maxkavun.simulation.entity.*;
 import main.java.maxkavun.simulation.entity.herbivore.Pig;
 import main.java.maxkavun.simulation.entity.herbivore.Rabbit;
-import main.java.maxkavun.simulation.entity.herbivore.resources.Apple;
-import main.java.maxkavun.simulation.entity.herbivore.resources.Grass;
 import main.java.maxkavun.simulation.entity.predator.Wolf;
-import main.java.maxkavun.simulation.map.Cell;
 import main.java.maxkavun.simulation.map.Coordinate;
 import main.java.maxkavun.simulation.map.SimulationMap;
-import main.java.maxkavun.simulation.renderer.Renderer;
+import main.java.maxkavun.simulation.renderer.ConsoleRenderer;
 
 
 import java.util.ArrayList;
@@ -25,7 +19,7 @@ import static java.lang.Thread.sleep;
 public class InitActions {
     public static final List<Creature> creatures = new ArrayList<Creature>();
 
-
+    // TODO должен только начинать симуляцию
     public static void startSimulation(int moves)  {
 
         for (int move = 0; move < moves ; move++) {
@@ -38,7 +32,7 @@ public class InitActions {
                 }
             }
 
-            Renderer.drawMap(SimulationMap.getInstance());
+            ConsoleRenderer.drawMap(SimulationMap.getInstance());
             TurnActions.checkForVictoryCondition(creatures);
             try {
                 sleep(1200);
@@ -49,59 +43,34 @@ public class InitActions {
         SimulationDisplay.showMiddleDisplay();
     }
 
-    public static void initialMap() {
+    /* Initializes the map and adds all created creatures to the list for further monitoring of their alive status */
+    public static void initializeMap() {
         int counterRabbit = 0;
         int counterWolf = 0;
         int counterPig = 0;
 
-        for (int i = 0; i < SimulationMap.getInstance().getHEIGHT(); i++) {
-            for (int j = 0; j < SimulationMap.getInstance().getWIDTH(); j++) {
-                Coordinate coordinate = new Coordinate(i, j);
-                int randomInt = (int) (Math.random() * 201);
-                Cell cell;
+        EntityFactory entityFactory = new EntityFactory();
 
-                switch (randomInt) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                        cell = new Cell(coordinate, new Rock());
-                        break;
-                    case 5:
-                    case 6:
-                    case 7:
-                    case 8:
-                        cell = new Cell(coordinate, new Tree());
-                        break;
-                    case 9:
-                        cell = new Cell(coordinate, new Pig(coordinate));
-                        creatures.add((Creature) cell.getEntity());
+        for (int i = 0; i < SimulationMap.getInstance().getHeight(); i++) {
+            for (int j = 0; j < SimulationMap.getInstance().getWidth(); j++) {
+                Coordinate coordinate = new Coordinate(i, j);
+                Entity entity = entityFactory.createEntity(coordinate);
+
+                if (entity instanceof Creature) {
+                    creatures.add((Creature) entity);
+                    ((Creature) entity).setCurrentPosition(coordinate);
+                    if (entity instanceof Pig) {
                         counterPig++;
-                        break;
-                    case 10:
-                        cell = new Cell(coordinate, new Rabbit(coordinate));
-                        creatures.add((Creature) cell.getEntity());
+                    } else if (entity instanceof Rabbit) {
                         counterRabbit++;
-                        break;
-                    case 11:
-                        cell = new Cell(coordinate, new Wolf(coordinate));
-                        creatures.add((Creature) cell.getEntity());
+                    } else if (entity instanceof Wolf) {
                         counterWolf++;
-                        break;
-                    case 12:
-                    case 13:
-                    case 14:
-                        cell = new Cell(coordinate, new Grass());
-                        break;
-                    case 15:
-                    case 16:
-                    case 17:
-                        cell = new Cell(coordinate, new Apple());
-                        break;
-                    default:
-                        cell = new Cell(coordinate, new EmptyPlace());
+                    }
                 }
-                SimulationMap.getInstance().getMap().put(coordinate, cell);
+
+                SimulationMap.getInstance()
+                        .getMap()
+                        .put(coordinate, entity);
             }
         }
         if (counterPig == 0) {

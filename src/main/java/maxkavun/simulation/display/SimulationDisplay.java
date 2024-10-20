@@ -2,7 +2,7 @@ package main.java.maxkavun.simulation.display;
 import main.java.maxkavun.simulation.actions.InitActions;
 import main.java.maxkavun.simulation.actions.TurnActions;
 import main.java.maxkavun.simulation.map.SimulationMap;
-import main.java.maxkavun.simulation.renderer.Renderer;
+import main.java.maxkavun.simulation.renderer.ConsoleRenderer;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -26,7 +26,7 @@ public class SimulationDisplay {
                 break;
             case 2:
                 System.out.println("Generating map...\n");
-                Renderer.drawMap(SimulationMap.getInstance());
+                ConsoleRenderer.drawMap(SimulationMap.getInstance());
                 showInitialDisplay();
                 break;
             case 3:
@@ -86,7 +86,7 @@ public class SimulationDisplay {
         }
     }
 
-
+    //TODO как то переименовать
     public static void showFinalDisplay() {
         System.out.println("1. Start a new simulation");
         System.out.println("2. Exit");

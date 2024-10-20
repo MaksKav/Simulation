@@ -16,7 +16,7 @@ import main.java.maxkavun.simulation.map.SimulationMap;
 
 import java.util.*;
 
-
+// TODO убрать instanceOf  !_!_!_!_!_!_!_!
 public abstract class Creature extends Entity {
 
     protected int health;
@@ -54,7 +54,7 @@ public abstract class Creature extends Entity {
             this.applyHungerDamage();
             if (this.getHealth() <= 0 ){
                 this.creatureDeath();
-                TurnActions.putEmptyPlace(this.currentPosition);
+                TurnActions.putEmptyPlaceOnMap(this.currentPosition);
             }
         }
     }
@@ -64,7 +64,7 @@ public abstract class Creature extends Entity {
      * This method handles the movement of a creature toward its target,
      * managing its interactions with other entities like herbivores or resources along the way.
      * It moves the creature step by step, allowing it to either consume its target or continue moving if there are steps remaining.
-     * */
+     */
     private void executeMovementSteps() {
         Coordinate targetCoordinate = this.findClosestResources(SimulationMap.getInstance());
 

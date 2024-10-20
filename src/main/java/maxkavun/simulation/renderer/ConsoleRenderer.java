@@ -6,10 +6,10 @@ import main.java.maxkavun.simulation.map.SimulationMap;
 
 import java.util.Map;
 
-public class Renderer {
+public class ConsoleRenderer {
 
     public static void drawMap(SimulationMap map) {
-        Cell[][] cellArray = new Cell[map.getHEIGHT()][map.getWIDTH()];
+        Cell[][] cellArray = new Cell[map.getHeight()][map.getWidth()];
         for (Map.Entry<Coordinate, Cell> entry : SimulationMap.getInstance().getMap().entrySet()) {
             cellArray[entry.getKey().getX()][entry.getKey().getY()] = entry.getValue();
         }

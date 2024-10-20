@@ -8,12 +8,12 @@ import main.java.maxkavun.simulation.entity.herbivore.Pig;
 import main.java.maxkavun.simulation.entity.herbivore.Rabbit;
 import main.java.maxkavun.simulation.entity.herbivore.resources.Apple;
 import main.java.maxkavun.simulation.entity.herbivore.resources.Grass;
+import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
 import main.java.maxkavun.simulation.entity.predator.Predator;
 import main.java.maxkavun.simulation.entity.predator.Wolf;
-import main.java.maxkavun.simulation.map.Cell;
 import main.java.maxkavun.simulation.map.Coordinate;
 import main.java.maxkavun.simulation.map.SimulationMap;
-import main.java.maxkavun.simulation.renderer.Renderer;
+import main.java.maxkavun.simulation.renderer.ConsoleRenderer;
 
 import java.util.InputMismatchException;
 import java.util.List;
@@ -24,7 +24,7 @@ import static java.lang.Thread.sleep;
 import static main.java.maxkavun.simulation.map.Coordinate.getRandomCoordinate;
 import static main.java.maxkavun.simulation.map.Coordinate.isValidCoordinate;
 
-
+// TODO убрать статичность + переименовать  TurnActionService  , InitActionService
 public class TurnActions {
 
 
@@ -32,13 +32,15 @@ public class TurnActions {
     This method adds the specified number of resources to the map for herbivores.
     */
     public static void addHerbivoreResources(int quantity, SimulationMap map) {
+        final int APPLE_THRESHOLD = 4; // Threshold for generating an apple
+        final int MAX_RANDOM = 10; // Maximum value for random number generation
 
         for (int i = 0; i < quantity; i++) {
             Coordinate coordinate = Coordinate.getRandomCoordinate();
-            if (Coordinate.isValidCoordinate(coordinate, SimulationMap.getInstance())) {
-                int random = (int) (Math.random() * 10);
-                var cell = new Cell(coordinate, random > 4 ? new Apple() : new Grass());
-                map.getMap().put(coordinate, cell);
+            if (Coordinate.isValidCoordinate(coordinate, map)) {
+                int random = (int) (Math.random() * MAX_RANDOM);
+                HerbivoreResources resource = random > APPLE_THRESHOLD ? new Apple() : new Grass();
+                map.getMap().put(coordinate, resource); // Directly put the resource in the map
             } else {
                 i--;
             }
@@ -47,8 +49,8 @@ public class TurnActions {
 
 
     /* Replaces the selected cell with an empty space */
-    public static void putEmptyPlace(Coordinate coordinate) {
-        SimulationMap.getInstance().getMap().put(coordinate, new Cell(coordinate, new EmptyPlace()));
+    public static void putEmptyPlaceOnMap(Coordinate coordinate) {
+        SimulationMap.getInstance().getMap().put(coordinate, new EmptyPlace());
     }
 
 
@@ -66,7 +68,7 @@ public class TurnActions {
         }
 
         if (herbivoreCount == 0 && predatorCount > 0) {
-            Renderer.drawMap(SimulationMap.getInstance());
+            ConsoleRenderer.drawMap(SimulationMap.getInstance());
             System.out.println("Game over - all herbivores have been eaten");
             System.out.println("Predators WIN ! \n");
             try {
@@ -77,7 +79,7 @@ public class TurnActions {
                 SimulationDisplay.showFinalDisplay();
             }
         } else if (predatorCount == 0 && herbivoreCount > 0) {
-            Renderer.drawMap(SimulationMap.getInstance());
+            ConsoleRenderer.drawMap(SimulationMap.getInstance());
             System.out.println("Game over - all predators died");
             System.out.println("Herbivores WIN ! \n");
             try {
@@ -138,7 +140,7 @@ public class TurnActions {
         }
     }
 
-
+    // TODO переименовать метод , нормально обьяснить что он делает IF в название не сувать
     public static void addCreature(Creature creature) {
         Coordinate coordinate = getRandomCoordinate();
 

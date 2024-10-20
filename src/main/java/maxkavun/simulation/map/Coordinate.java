@@ -29,11 +29,11 @@ public class Coordinate {
         if (map.getMap().containsKey(coordinate)) {
             Entity cellEntity = map.getMap().get(coordinate).getEntity();
             return cellEntity instanceof EmptyPlace;
-        } else {
-            return false;
         }
+        return false;
     }
 
+    
     /*
      This method checks if the given coordinate is valid for the creature's next move.
      */
@@ -52,10 +52,11 @@ public class Coordinate {
 
 
     public static Coordinate getRandomCoordinate() {
-        int randomHeight = (int) (Math.random() * (SimulationMap.getInstance().getHEIGHT()));
-        int randomWidth = (int) (Math.random() * (SimulationMap.getInstance().getWIDTH()));
+        int randomHeight = (int) (Math.random() * (SimulationMap.getInstance().getHeight()));
+        int randomWidth = (int) (Math.random() * (SimulationMap.getInstance().getWidth()));
         return new Coordinate(randomWidth, randomHeight);
     }
+
 
     @Override
     public boolean equals(Object o) {
