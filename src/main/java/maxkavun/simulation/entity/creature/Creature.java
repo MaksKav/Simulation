@@ -40,19 +40,15 @@ public abstract class Creature extends Entity {
     public abstract int getHungerDamage();
 
 
-
     public void makeMove() {
         int healthAtNow = this.getHealth();
         if (availableSteps == 0) {
             this.reloadSteps();
         }
-
         executeMovementSteps();
-
-        if (isHealthUnchanged(healthAtNow)){
+        if (isHealthUnchanged(healthAtNow)) {
             applyDamageAndCheckDeath();
         }
-
     }
 
 
@@ -74,27 +70,29 @@ public abstract class Creature extends Entity {
 
                     // The logic of interaction between the predator and its resource (herbivore).
                     if (this instanceof Predator) {
-                        if (((Herbivore) targetEntity).getHealth() > 0) {
-                            this.eat((Herbivore) targetEntity);
-                            if (!((Herbivore) targetEntity).getIsAlive() && this.availableSteps > 0) {
+                        Herbivore predatorResource = (Herbivore) targetEntity;
+                        if (predatorResource.getHealth() > 0) {
+                            this.eat(predatorResource);
+                            if (!predatorResource.getIsAlive() && this.availableSteps > 0) {
                                 goNextCell(nextStepCoordinate);
-                                if (this.availableSteps > 0 && !((Herbivore) targetEntity).getIsAlive()) {
+                                if (this.availableSteps > 0 && !predatorResource.getIsAlive()) {
                                     executeMovementSteps();
                                 }
-                            } else if (!((Herbivore) targetEntity).getIsAlive() && this.availableSteps <= 0) {
+                            } else if (!predatorResource.getIsAlive() && this.availableSteps <= 0) {
                                 TurnActionService.putEmptyPlaceOnMap(nextStepCoordinate);
                             }
                         }
                         // The logic of interaction between the herbivore and its resource.
                     } else if (this instanceof Herbivore) {
-                        if (((HerbivoreResources) targetEntity).getHealth() > 0) {
+                        HerbivoreResources herbivoreResources = ((HerbivoreResources) targetEntity);
+                        if (herbivoreResources.getHealth() > 0) {
                             this.eat((HerbivoreResources) targetEntity);
-                            if (((HerbivoreResources) targetEntity).getHealth() <= 0 && this.availableSteps > 0) {
+                            if (herbivoreResources.getHealth() <= 0 && this.availableSteps > 0) {
                                 goNextCell(nextStepCoordinate);
                                 if (this.availableSteps > 0) {
                                     executeMovementSteps();
                                 }
-                            } else if (((HerbivoreResources) targetEntity).getHealth() <= 0 && this.availableSteps <= 0) {
+                            } else if (herbivoreResources.getHealth() <= 0 && this.availableSteps <= 0) {
                                 TurnActionService.putEmptyPlaceOnMap(nextStepCoordinate);
                             }
                         }
@@ -137,7 +135,7 @@ public abstract class Creature extends Entity {
             Optional<Coordinate> bestNeighbour = getNeighbourWithBestDistanceToTarget(currentCoordinate, target, map, visitedCoordinates);
             bestNeighbour.ifPresent(queue::add);
         }
-         return Collections.emptyList();
+        return Collections.emptyList();
     }
 
 
@@ -251,8 +249,8 @@ public abstract class Creature extends Entity {
     }
 
     /* This method decreases the creature's health if it hasn't eaten during the entire round */
-    private void applyHungerDamage (){
-            this.setHealth(this.getHealth() - getHungerDamage());
+    private void applyHungerDamage() {
+        this.setHealth(this.getHealth() - getHungerDamage());
     }
 
     public boolean getIsAlive() {

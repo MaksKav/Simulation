@@ -1,6 +1,5 @@
 package main.java.maxkavun.simulation.map;
 
-import main.java.maxkavun.simulation.actions.InitActionService;
 import main.java.maxkavun.simulation.entity.Entity;
 
 import java.util.HashMap;

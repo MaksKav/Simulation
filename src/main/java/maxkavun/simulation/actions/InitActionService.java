@@ -68,7 +68,6 @@ public class InitActionService {
                         counterWolf++;
                     }
                 }
-
                 SimulationMap.getInstance()
                         .getMap()
                         .put(coordinate, entity);
