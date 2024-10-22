@@ -1,10 +1,10 @@
 package main.java.maxkavun.simulation.entity;
 
-import main.java.maxkavun.simulation.entity.herbivore.Pig;
-import main.java.maxkavun.simulation.entity.herbivore.Rabbit;
-import main.java.maxkavun.simulation.entity.herbivore.resources.Apple;
-import main.java.maxkavun.simulation.entity.herbivore.resources.Grass;
-import main.java.maxkavun.simulation.entity.predator.Wolf;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Pig;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Rabbit;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.Apple;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.Grass;
+import main.java.maxkavun.simulation.entity.creature.predator.Wolf;
 import main.java.maxkavun.simulation.map.Coordinate;
 
 public class EntityFactory {

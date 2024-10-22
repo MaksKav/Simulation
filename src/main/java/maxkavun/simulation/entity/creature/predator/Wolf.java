@@ -1,9 +1,10 @@
-package main.java.maxkavun.simulation.entity.predator;
+package main.java.maxkavun.simulation.entity.creature.predator;
 
 import main.java.maxkavun.simulation.map.Coordinate;
 
 public class Wolf extends Predator {
 
+    private static final int RABBIT_HUNGER_DAMAGE = 12;
 
     public Wolf(Coordinate coordinate) {
         super(coordinate);
@@ -23,6 +24,11 @@ public class Wolf extends Predator {
     @Override
     public void reloadSteps() {
         setAvailableSteps(2);
+    }
+
+    @Override
+    public int getHungerDamage() {
+        return RABBIT_HUNGER_DAMAGE;
     }
 
     @Override

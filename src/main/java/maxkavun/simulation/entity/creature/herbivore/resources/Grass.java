@@ -1,4 +1,4 @@
-package main.java.maxkavun.simulation.entity.herbivore.resources;
+package main.java.maxkavun.simulation.entity.creature.herbivore.resources;
 
 public class Grass extends HerbivoreResources {
 
@@ -12,7 +12,4 @@ public class Grass extends HerbivoreResources {
         return icon;
     }
 
-    public String getIcon() {
-        return icon;
-    }
 }

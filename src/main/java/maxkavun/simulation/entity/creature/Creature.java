@@ -1,31 +1,28 @@
-package main.java.maxkavun.simulation.entity;
+package main.java.maxkavun.simulation.entity.creature;
 
-
-import main.java.maxkavun.simulation.actions.InitActions;
-import main.java.maxkavun.simulation.actions.TurnActions;
-import main.java.maxkavun.simulation.entity.herbivore.Herbivore;
-import main.java.maxkavun.simulation.entity.herbivore.Pig;
-import main.java.maxkavun.simulation.entity.herbivore.Rabbit;
-import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
-import main.java.maxkavun.simulation.entity.predator.Predator;
-import main.java.maxkavun.simulation.entity.predator.Wolf;
-import main.java.maxkavun.simulation.map.Cell;
+import main.java.maxkavun.simulation.actions.InitActionService;
+import main.java.maxkavun.simulation.actions.TurnActionService;
+import main.java.maxkavun.simulation.entity.EmptyPlace;
+import main.java.maxkavun.simulation.entity.Entity;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Herbivore;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.HerbivoreResources;
+import main.java.maxkavun.simulation.entity.creature.predator.Predator;
 import main.java.maxkavun.simulation.map.Coordinate;
 import main.java.maxkavun.simulation.map.SimulationMap;
+import main.java.maxkavun.simulation.map.SimulationMapUtils;
 
 
 import java.util.*;
 
-// TODO убрать instanceOf  !_!_!_!_!_!_!_!
+
 public abstract class Creature extends Entity {
 
     protected int health;
     protected int availableSteps;
     protected boolean isAlive = true;
-
     protected Coordinate currentPosition;
-    protected List<Coordinate> pathToResources = new ArrayList<>();
 
+    protected List<Coordinate> pathToResources = new ArrayList<>();
 
     public Creature(Coordinate currentPosition) {
         this.currentPosition = currentPosition;
@@ -40,6 +37,9 @@ public abstract class Creature extends Entity {
 
     public abstract void reloadSteps();
 
+    public abstract int getHungerDamage();
+
+
 
     public void makeMove() {
         int healthAtNow = this.getHealth();
@@ -49,14 +49,10 @@ public abstract class Creature extends Entity {
 
         executeMovementSteps();
 
-
-        if (healthAtNow == this.getHealth()){
-            this.applyHungerDamage();
-            if (this.getHealth() <= 0 ){
-                this.creatureDeath();
-                TurnActions.putEmptyPlaceOnMap(this.currentPosition);
-            }
+        if (isHealthUnchanged(healthAtNow)){
+            applyDamageAndCheckDeath();
         }
+
     }
 
 
@@ -74,7 +70,7 @@ public abstract class Creature extends Entity {
                 Coordinate nextStepCoordinate = this.pathToResources.get(0);
 
                 if (nextStepCoordinate.equals(targetCoordinate)) {
-                    Entity targetEntity = SimulationMap.getInstance().getMap().get(targetCoordinate).getEntity();
+                    Entity targetEntity = SimulationMap.getInstance().getMap().get(targetCoordinate);
 
                     // The logic of interaction between the predator and its resource (herbivore).
                     if (this instanceof Predator) {
@@ -86,7 +82,7 @@ public abstract class Creature extends Entity {
                                     executeMovementSteps();
                                 }
                             } else if (!((Herbivore) targetEntity).getIsAlive() && this.availableSteps <= 0) {
-                                SimulationMap.getInstance().getMap().put(nextStepCoordinate, new Cell(nextStepCoordinate, new EmptyPlace()));
+                                TurnActionService.putEmptyPlaceOnMap(nextStepCoordinate);
                             }
                         }
                         // The logic of interaction between the herbivore and its resource.
@@ -99,7 +95,7 @@ public abstract class Creature extends Entity {
                                     executeMovementSteps();
                                 }
                             } else if (((HerbivoreResources) targetEntity).getHealth() <= 0 && this.availableSteps <= 0) {
-                                SimulationMap.getInstance().getMap().put(nextStepCoordinate, new Cell(nextStepCoordinate, new EmptyPlace()));
+                                TurnActionService.putEmptyPlaceOnMap(nextStepCoordinate);
                             }
                         }
                     }
@@ -113,7 +109,6 @@ public abstract class Creature extends Entity {
         }
     }
 
-
     /*
      * This method searches for the shortest path to the target using a dynamic selection of the next best step.
      * It adds each step to the result until the target is reached.
@@ -125,12 +120,10 @@ public abstract class Creature extends Entity {
         Set<Coordinate> visitedCoordinates = new HashSet<>();
 
         queue.add(start);
-//        visitedCoordinates.add(start);
 
         while (!queue.isEmpty()) {
             Coordinate currentCoordinate = queue.poll();
             visitedCoordinates.add(currentCoordinate);
-
 
             if (currentCoordinate.equals(target)) {
                 result.add(currentCoordinate);
@@ -140,7 +133,6 @@ public abstract class Creature extends Entity {
             if (!currentCoordinate.equals(start)) {
                 result.add(currentCoordinate);
             }
-
 
             Optional<Coordinate> bestNeighbour = getNeighbourWithBestDistanceToTarget(currentCoordinate, target, map, visitedCoordinates);
             bestNeighbour.ifPresent(queue::add);
@@ -158,16 +150,16 @@ public abstract class Creature extends Entity {
         int x = coordinate.getX();
         int y = coordinate.getY();
 
-        if (Coordinate.isValidCoordinate(this, new Coordinate(x + 1, y), map) && !visitedCoordinates.contains(new Coordinate(x + 1, y))) {
+        if (SimulationMapUtils.isValidCoordinateOnMap(this, new Coordinate(x + 1, y), map) && !visitedCoordinates.contains(new Coordinate(x + 1, y))) {
             neighbours.add(new Coordinate(x + 1, y));
         }
-        if (Coordinate.isValidCoordinate(this, new Coordinate(x, y + 1), map) && !visitedCoordinates.contains(new Coordinate(x, y + 1))) {
+        if (SimulationMapUtils.isValidCoordinateOnMap(this, new Coordinate(x, y + 1), map) && !visitedCoordinates.contains(new Coordinate(x, y + 1))) {
             neighbours.add(new Coordinate(x, y + 1));
         }
-        if (Coordinate.isValidCoordinate(this, new Coordinate(x, y - 1), map) && !visitedCoordinates.contains(new Coordinate(x, y - 1))) {
+        if (SimulationMapUtils.isValidCoordinateOnMap(this, new Coordinate(x, y - 1), map) && !visitedCoordinates.contains(new Coordinate(x, y - 1))) {
             neighbours.add(new Coordinate(x, y - 1));
         }
-        if (Coordinate.isValidCoordinate(this, new Coordinate(x - 1, y), map) && !visitedCoordinates.contains(new Coordinate(x - 1, y))) {
+        if (SimulationMapUtils.isValidCoordinateOnMap(this, new Coordinate(x - 1, y), map) && !visitedCoordinates.contains(new Coordinate(x - 1, y))) {
             neighbours.add(new Coordinate(x - 1, y));
         }
 
@@ -186,7 +178,6 @@ public abstract class Creature extends Entity {
     }
 
 
-
     /*
      * This method finds the nearest specified object for the selected animal.
      * It returns the currentPosition of the closest resource or null if not found.
@@ -196,9 +187,9 @@ public abstract class Creature extends Entity {
         Coordinate closestCoordinate = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (Map.Entry<Coordinate, Cell> entry : map.getMap().entrySet()) {
+        for (Map.Entry<Coordinate, Entity> entry : map.getMap().entrySet()) {
             Coordinate coordinate = entry.getKey();
-            Entity cellEntity = entry.getValue().getEntity();
+            Entity cellEntity = entry.getValue();
 
             if (this instanceof Herbivore) {
                 if (cellEntity instanceof HerbivoreResources) {
@@ -221,12 +212,12 @@ public abstract class Creature extends Entity {
 
         }
         if (this instanceof Herbivore && closestCoordinate == null) {
-            TurnActions.addHerbivoreResources(3, SimulationMap.getInstance());
+            TurnActionService.addHerbivoreResources(3, SimulationMap.getInstance());
             executeMovementSteps();
         }
 
         if (this instanceof Predator && closestCoordinate == null) {
-            TurnActions.checkForVictoryCondition(InitActions.creatures);
+            TurnActionService.checkForVictoryCondition(InitActionService.creatures);
         }
 
         return closestCoordinate;
@@ -238,27 +229,31 @@ public abstract class Creature extends Entity {
         return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
     }
 
-
     private void goNextCell(Coordinate nextStep) {
-        Coordinate beforePosition = new Coordinate(this.getCurrentPosition().getX(), this.getCurrentPosition().getY());
+        Coordinate previousPosition = new Coordinate(this.getCurrentPosition().getX(), this.getCurrentPosition().getY());
         this.setCurrentPosition(nextStep);
-        SimulationMap.getInstance().getMap().put(nextStep, new Cell(nextStep, this));
-        SimulationMap.getInstance().getMap().put(beforePosition, new Cell(beforePosition, new EmptyPlace()));
+        SimulationMap.getInstance().getMap().put(nextStep, this);
+        SimulationMap.getInstance().getMap().put(previousPosition, new EmptyPlace());
         this.setAvailableSteps(this.getAvailableSteps() - 1);
     }
 
 
-    /* This method decreases the creature's health if it hasn't eaten during the entire round */
-    private void applyHungerDamage (){
-        if (this instanceof Wolf){
-            this.setHealth(this.getHealth() - 12);
-        }else if (this instanceof Pig){
-            this.setHealth(this.getHealth() - 7);
-        } else if (this instanceof Rabbit) {
-            this.setHealth(this.getHealth() - 5);
+    private boolean isHealthUnchanged(int healthAtNow) {
+        return healthAtNow == this.getHealth();
+    }
+
+    private void applyDamageAndCheckDeath() {
+        this.applyHungerDamage();
+        if (this.getHealth() <= 0) {
+            this.creatureDeath();
+            TurnActionService.putEmptyPlaceOnMap(this.currentPosition);
         }
     }
 
+    /* This method decreases the creature's health if it hasn't eaten during the entire round */
+    private void applyHungerDamage (){
+            this.setHealth(this.getHealth() - getHungerDamage());
+    }
 
     public boolean getIsAlive() {
         return isAlive;

@@ -1,32 +1,30 @@
 package main.java.maxkavun.simulation.actions;
 
 import main.java.maxkavun.simulation.display.SimulationDisplay;
-import main.java.maxkavun.simulation.entity.Creature;
+import main.java.maxkavun.simulation.entity.creature.Creature;
 import main.java.maxkavun.simulation.entity.EmptyPlace;
-import main.java.maxkavun.simulation.entity.herbivore.Herbivore;
-import main.java.maxkavun.simulation.entity.herbivore.Pig;
-import main.java.maxkavun.simulation.entity.herbivore.Rabbit;
-import main.java.maxkavun.simulation.entity.herbivore.resources.Apple;
-import main.java.maxkavun.simulation.entity.herbivore.resources.Grass;
-import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
-import main.java.maxkavun.simulation.entity.predator.Predator;
-import main.java.maxkavun.simulation.entity.predator.Wolf;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Herbivore;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Pig;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Rabbit;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.Apple;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.Grass;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.HerbivoreResources;
+import main.java.maxkavun.simulation.entity.creature.predator.Predator;
+import main.java.maxkavun.simulation.entity.creature.predator.Wolf;
 import main.java.maxkavun.simulation.map.Coordinate;
 import main.java.maxkavun.simulation.map.SimulationMap;
+import main.java.maxkavun.simulation.map.SimulationMapUtils;
 import main.java.maxkavun.simulation.renderer.ConsoleRenderer;
-
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
 import static java.lang.Thread.sleep;
-import static main.java.maxkavun.simulation.map.Coordinate.getRandomCoordinate;
-import static main.java.maxkavun.simulation.map.Coordinate.isValidCoordinate;
 
-// TODO убрать статичность + переименовать  TurnActionService  , InitActionService
-public class TurnActions {
 
+
+public class TurnActionService {
 
     /*
     This method adds the specified number of resources to the map for herbivores.
@@ -36,8 +34,8 @@ public class TurnActions {
         final int MAX_RANDOM = 10; // Maximum value for random number generation
 
         for (int i = 0; i < quantity; i++) {
-            Coordinate coordinate = Coordinate.getRandomCoordinate();
-            if (Coordinate.isValidCoordinate(coordinate, map)) {
+            Coordinate coordinate = SimulationMapUtils.getRandomCoordinateOnMap();
+            if (SimulationMapUtils.isValidCoordinateOnMap(coordinate, map)) {
                 int random = (int) (Math.random() * MAX_RANDOM);
                 HerbivoreResources resource = random > APPLE_THRESHOLD ? new Apple() : new Grass();
                 map.getMap().put(coordinate, resource); // Directly put the resource in the map
@@ -55,7 +53,9 @@ public class TurnActions {
 
 
     public static void checkForVictoryCondition(List<Creature> creatureList) {
-        InitActions.creatures.removeIf(creature -> !creature.getIsAlive());
+        ConsoleRenderer renderer = new ConsoleRenderer();
+
+        InitActionService.creatures.removeIf(creature -> !creature.getIsAlive());
         int herbivoreCount = 0;
         int predatorCount = 0;
 
@@ -68,7 +68,7 @@ public class TurnActions {
         }
 
         if (herbivoreCount == 0 && predatorCount > 0) {
-            ConsoleRenderer.drawMap(SimulationMap.getInstance());
+            renderer.drawMap(SimulationMap.getInstance());
             System.out.println("Game over - all herbivores have been eaten");
             System.out.println("Predators WIN ! \n");
             try {
@@ -76,10 +76,10 @@ public class TurnActions {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }finally {
-                SimulationDisplay.showFinalDisplay();
+                SimulationDisplay.showEndSimulationMenu(renderer);
             }
         } else if (predatorCount == 0 && herbivoreCount > 0) {
-            ConsoleRenderer.drawMap(SimulationMap.getInstance());
+            renderer.drawMap(SimulationMap.getInstance());
             System.out.println("Game over - all predators died");
             System.out.println("Herbivores WIN ! \n");
             try {
@@ -87,7 +87,7 @@ public class TurnActions {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }finally {
-                SimulationDisplay.showFinalDisplay();
+                SimulationDisplay.showEndSimulationMenu(renderer);
             }
         }
     }
@@ -104,28 +104,28 @@ public class TurnActions {
                 }
 
                 for (int i = 0; i < count; i++) {
-                    Coordinate coordinate = Coordinate.getRandomCoordinate();
-                    if (Coordinate.isValidCoordinate(coordinate, SimulationMap.getInstance())) {
+                    Coordinate coordinate = SimulationMapUtils.getRandomCoordinateOnMap();
+                    if (SimulationMapUtils.isValidCoordinateOnMap(coordinate, SimulationMap.getInstance())) {
                         switch (creature_type) {
                             case "all types":
                                 int rand = random.nextInt(3);
                                 switch (rand) {
                                     case 0:
-                                        addCreature(new Wolf());
+                                        spawnCreatureOnValidPosition(new Wolf());
                                         break;
                                     case 1:
-                                        addCreature(new Rabbit());
+                                        spawnCreatureOnValidPosition(new Rabbit());
                                         break;
                                     case 2:
-                                        addCreature(new Pig());
+                                        spawnCreatureOnValidPosition(new Pig());
                                 }
                                 break;
                             case "herbivores":
                                 int rand1 = random.nextInt(2);
-                                addCreature(rand1 > 0 ? new Pig() : new Rabbit());
+                                spawnCreatureOnValidPosition(rand1 > 0 ? new Pig() : new Rabbit());
                                 break;
                             case "predators":
-                                addCreature(new Wolf());
+                                spawnCreatureOnValidPosition(new Wolf());
                                 break;
                         }
                     } else {
@@ -140,17 +140,16 @@ public class TurnActions {
         }
     }
 
-    // TODO переименовать метод , нормально обьяснить что он делает IF в название не сувать
-    public static void addCreature(Creature creature) {
-        Coordinate coordinate = getRandomCoordinate();
 
-        if (isValidCoordinate(coordinate, SimulationMap.getInstance())) {
+    public static void spawnCreatureOnValidPosition(Creature creature) {
+        Coordinate coordinate = SimulationMapUtils.getRandomCoordinateOnMap();
+
+        if (SimulationMapUtils.isValidCoordinateOnMap(coordinate, SimulationMap.getInstance())) {
             creature.setCurrentPosition(coordinate);
-            Cell cell = new Cell(coordinate, creature);
-            SimulationMap.getInstance().getMap().put(coordinate, cell);
-            InitActions.creatures.add((Creature) cell.getEntity());
+            SimulationMap.getInstance().getMap().put(coordinate, creature);
+            InitActionService.creatures.add((Creature) creature);
         } else {
-            addCreature(creature);
+            spawnCreatureOnValidPosition(creature);
         }
     }
 

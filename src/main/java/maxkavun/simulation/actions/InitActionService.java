@@ -2,12 +2,13 @@ package main.java.maxkavun.simulation.actions;
 
 import main.java.maxkavun.simulation.display.SimulationDisplay;
 import main.java.maxkavun.simulation.entity.*;
-import main.java.maxkavun.simulation.entity.herbivore.Pig;
-import main.java.maxkavun.simulation.entity.herbivore.Rabbit;
-import main.java.maxkavun.simulation.entity.predator.Wolf;
+import main.java.maxkavun.simulation.entity.creature.Creature;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Pig;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Rabbit;
+import main.java.maxkavun.simulation.entity.creature.predator.Wolf;
 import main.java.maxkavun.simulation.map.Coordinate;
 import main.java.maxkavun.simulation.map.SimulationMap;
-import main.java.maxkavun.simulation.renderer.ConsoleRenderer;
+import main.java.maxkavun.simulation.renderer.Renderer;
 
 
 import java.util.ArrayList;
@@ -16,31 +17,31 @@ import java.util.List;
 import static java.lang.Thread.sleep;
 
 
-public class InitActions {
+public class InitActionService {
     public static final List<Creature> creatures = new ArrayList<Creature>();
 
-    // TODO должен только начинать симуляцию
-    public static void startSimulation(int moves)  {
+
+    public static void startSimulation(int moves , Renderer renderer)  {
 
         for (int move = 0; move < moves ; move++) {
 
-            InitActions.creatures.removeIf(creature -> !creature.getIsAlive());
+            InitActionService.creatures.removeIf(creature -> !creature.getIsAlive());
 
-            for (Creature creature : InitActions.creatures) {
+            for (Creature creature : InitActionService.creatures) {
                 if (creature.getIsAlive()) {
                     creature.makeMove();
                 }
             }
 
-            ConsoleRenderer.drawMap(SimulationMap.getInstance());
-            TurnActions.checkForVictoryCondition(creatures);
+            renderer.drawMap(SimulationMap.getInstance());
+            TurnActionService.checkForVictoryCondition(creatures);
             try {
                 sleep(1200);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        SimulationDisplay.showMiddleDisplay();
+        SimulationDisplay.displaySimulationOptions(renderer);
     }
 
     /* Initializes the map and adds all created creatures to the list for further monitoring of their alive status */
@@ -74,15 +75,15 @@ public class InitActions {
             }
         }
         if (counterPig == 0) {
-            TurnActions.addCreature(new Pig());
+            TurnActionService.spawnCreatureOnValidPosition(new Pig());
         }
 
         if (counterRabbit == 0) {
-            TurnActions.addCreature(new Rabbit());
+            TurnActionService.spawnCreatureOnValidPosition(new Rabbit());
         }
 
         if (counterWolf == 0) {
-           TurnActions.addCreature(new Wolf());
+           TurnActionService.spawnCreatureOnValidPosition(new Wolf());
         }
     }
 }

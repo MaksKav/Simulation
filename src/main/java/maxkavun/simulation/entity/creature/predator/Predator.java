@@ -1,8 +1,8 @@
-package main.java.maxkavun.simulation.entity.predator;
+package main.java.maxkavun.simulation.entity.creature.predator;
 
-import main.java.maxkavun.simulation.entity.Creature;
-import main.java.maxkavun.simulation.entity.herbivore.Herbivore;
-import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
+import main.java.maxkavun.simulation.entity.creature.Creature;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Herbivore;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.HerbivoreResources;
 import main.java.maxkavun.simulation.map.Coordinate;
 
 public abstract class Predator extends Creature {

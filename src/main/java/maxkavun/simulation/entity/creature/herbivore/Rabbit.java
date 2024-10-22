@@ -1,9 +1,10 @@
-package main.java.maxkavun.simulation.entity.herbivore;
+package main.java.maxkavun.simulation.entity.creature.herbivore;
 
 import main.java.maxkavun.simulation.map.Coordinate;
 
 public class Rabbit extends Herbivore {
 
+    private static final int RABBIT_HUNGER_DAMAGE = 5;
 
     public Rabbit(Coordinate coordinate) {
         super(coordinate);
@@ -21,6 +22,11 @@ public class Rabbit extends Herbivore {
     @Override
     public void reloadSteps() {
         setAvailableSteps(3);
+    }
+
+    @Override
+    public int getHungerDamage() {
+        return RABBIT_HUNGER_DAMAGE;
     }
 
     @Override

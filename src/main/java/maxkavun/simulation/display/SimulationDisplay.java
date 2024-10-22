@@ -1,8 +1,8 @@
 package main.java.maxkavun.simulation.display;
-import main.java.maxkavun.simulation.actions.InitActions;
-import main.java.maxkavun.simulation.actions.TurnActions;
+import main.java.maxkavun.simulation.actions.InitActionService;
+import main.java.maxkavun.simulation.actions.TurnActionService;
 import main.java.maxkavun.simulation.map.SimulationMap;
-import main.java.maxkavun.simulation.renderer.ConsoleRenderer;
+import main.java.maxkavun.simulation.renderer.Renderer;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -10,7 +10,8 @@ import java.util.Scanner;
 public class SimulationDisplay {
 
 
-    public static void showInitialDisplay() {
+    public static void displayMainMenu(Renderer renderer) {
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the 2D World Simulation");
         System.out.println("1. Start Simulation");
@@ -21,13 +22,15 @@ public class SimulationDisplay {
         int choice = scanner.nextInt();
         switch (choice) {
             case 1:
-                int moves = getNumberOfMoves(scanner);
-                InitActions.startSimulation(moves);
+                int moves = promptForValidMoveCount(scanner);
+                InitActionService.initializeMap();
+                InitActionService.startSimulation(moves , renderer);
                 break;
             case 2:
                 System.out.println("Generating map...\n");
-                ConsoleRenderer.drawMap(SimulationMap.getInstance());
-                showInitialDisplay();
+                InitActionService.initializeMap();
+                renderer.drawMap(SimulationMap.getInstance());
+                displayMainMenu(renderer);
                 break;
             case 3:
                 System.out.println("Exiting... \n" );
@@ -35,13 +38,13 @@ public class SimulationDisplay {
                 break;
             default:
                 System.out.println("Invalid choice, please try again.");
-                showInitialDisplay();
+                displayMainMenu(renderer);
                 break;
         }
     }
 
 
-    public static void showMiddleDisplay() {
+    public static void displaySimulationOptions(Renderer renderer) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("1. Continue simulation");
         System.out.println("2. Add random animal to the map");
@@ -54,26 +57,26 @@ public class SimulationDisplay {
         switch (choice) {
             case 1:
                 System.out.print("How many moves would you like to make? ");
-                int moves = getNumberOfMoves(scanner);
-                InitActions.startSimulation(moves);
+                int moves = promptForValidMoveCount(scanner);
+                InitActionService.startSimulation(moves , renderer);
                 break;
             case 2:
                 System.out.print("How many animals would you like to add to the map? (No more than 3)");
-                TurnActions.addAnimals(scanner, "all types");
+                TurnActionService.addAnimals(scanner, "all types");
                 System.out.println("Random animals were successfully added on the card \n");
-                showMiddleDisplay();
+                displaySimulationOptions(renderer);
                 break;
             case 3:
                 System.out.print("How many herbivores would you like to add to the map? (No more than 3)");
-                TurnActions.addAnimals(scanner, "herbivores");
+                TurnActionService.addAnimals(scanner, "herbivores");
                 System.out.println("Herbivores were successfully added on the card \n");
-                showMiddleDisplay();
+                displaySimulationOptions(renderer);
                 break;
             case 4:
                 System.out.print("How many predators would you like to add to the map? (No more than 3)");
-                TurnActions.addAnimals(scanner, "predators");
+                TurnActionService.addAnimals(scanner, "predators");
                 System.out.println("Predators were successfully added on the card \n");
-                showMiddleDisplay();
+                displaySimulationOptions(renderer);
                 break;
             case 5:
                 System.out.println("Ending simulation...");
@@ -81,13 +84,13 @@ public class SimulationDisplay {
                 break;
             default:
                 System.out.println("Invalid choice, please try again.");
-                showMiddleDisplay();
+                displaySimulationOptions(renderer);
                 break;
         }
     }
 
-    //TODO как то переименовать
-    public static void showFinalDisplay() {
+
+    public static void showEndSimulationMenu(Renderer renderer) {
         System.out.println("1. Start a new simulation");
         System.out.println("2. Exit");
         System.out.print("Choose an option: ");
@@ -97,8 +100,8 @@ public class SimulationDisplay {
         switch (choice) {
             case 1:
                 SimulationMap.resetInstance();
-                InitActions.creatures.clear();
-                showInitialDisplay();
+                InitActionService.creatures.clear();
+                displayMainMenu(renderer);
                 break;
             case 2:
                 System.out.println("Exiting...");
@@ -106,13 +109,13 @@ public class SimulationDisplay {
                 break;
             default:
                 System.out.println("Invalid choice, please try again.");
-                showFinalDisplay();
+                showEndSimulationMenu(renderer);
                 break;
         }
     }
 
 
-    private static int getNumberOfMoves(Scanner scanner) {
+    private static int promptForValidMoveCount(Scanner scanner) {
         while (true) {
             try {
                 System.out.print("How many moves would you like to generate for the first cycle? ");

@@ -1,4 +1,4 @@
-package main.java.maxkavun.simulation.entity.herbivore.resources;
+package main.java.maxkavun.simulation.entity.creature.herbivore.resources;
 
 import main.java.maxkavun.simulation.entity.Entity;
 

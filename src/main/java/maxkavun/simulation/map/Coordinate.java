@@ -1,12 +1,12 @@
 package main.java.maxkavun.simulation.map;
 
 
-import main.java.maxkavun.simulation.entity.Creature;
+import main.java.maxkavun.simulation.entity.creature.Creature;
 import main.java.maxkavun.simulation.entity.EmptyPlace;
 import main.java.maxkavun.simulation.entity.Entity;
-import main.java.maxkavun.simulation.entity.herbivore.Herbivore;
-import main.java.maxkavun.simulation.entity.herbivore.resources.HerbivoreResources;
-import main.java.maxkavun.simulation.entity.predator.Predator;
+import main.java.maxkavun.simulation.entity.creature.herbivore.Herbivore;
+import main.java.maxkavun.simulation.entity.creature.herbivore.resources.HerbivoreResources;
+import main.java.maxkavun.simulation.entity.creature.predator.Predator;
 
 import java.util.Objects;
 
@@ -20,43 +20,6 @@ public class Coordinate {
         this.x = x;
         this.y = y;
     }
-
-
-    /*
-      This method checks if the place is empty.
-     */
-    public static boolean isValidCoordinate(Coordinate coordinate, SimulationMap map) {
-        if (map.getMap().containsKey(coordinate)) {
-            Entity cellEntity = map.getMap().get(coordinate).getEntity();
-            return cellEntity instanceof EmptyPlace;
-        }
-        return false;
-    }
-
-    
-    /*
-     This method checks if the given coordinate is valid for the creature's next move.
-     */
-    public static boolean isValidCoordinate(Creature creature, Coordinate coordinate, SimulationMap map) {
-        Cell cell = map.getMap().get(coordinate);
-        if (cell != null) {
-            Entity cellEntity = cell.getEntity();
-            if (creature instanceof Herbivore) {
-                return cellEntity instanceof HerbivoreResources || cellEntity instanceof EmptyPlace;
-            } else if (creature instanceof Predator) {
-                return cellEntity instanceof Herbivore || cellEntity instanceof EmptyPlace;
-            }
-        }
-        return false;
-    }
-
-
-    public static Coordinate getRandomCoordinate() {
-        int randomHeight = (int) (Math.random() * (SimulationMap.getInstance().getHeight()));
-        int randomWidth = (int) (Math.random() * (SimulationMap.getInstance().getWidth()));
-        return new Coordinate(randomWidth, randomHeight);
-    }
-
 
     @Override
     public boolean equals(Object o) {
